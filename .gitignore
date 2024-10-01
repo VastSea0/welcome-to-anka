@@ -25,3 +25,4 @@ dist-ssr
 
 
 tests/systeminfo/target/
+tests/command_line/target/

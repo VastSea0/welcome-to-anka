@@ -20,8 +20,8 @@
     "windows": [
       {
         "title": "Welcome To AnkaOS",
-        "width": 1000,
-        "height": 800
+        "width": 1024,
+        "height": 768
       }
     ],
     "security": {
