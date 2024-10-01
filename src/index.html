@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to AnkaOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        let currentScreen = 0;
+        const screens = ['intro-screen', 'focus-screen', 'final-screen'];
+        
+        function showScreen(index) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screens[index]).classList.remove('hidden');
+        }
+        
+        function nextScreen() {
+            if (currentScreen < screens.length - 1) {
+                currentScreen++;
+                showScreen(currentScreen);
+            }
+        }
+        
+        function prevScreen() {
+            if (currentScreen > 0) {
+                currentScreen--;
+                showScreen(currentScreen);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen(currentScreen);
+        });
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <main class="flex-grow flex flex-col p-8">
+        <h1 class="text-4xl font-bold text-center text-blue-600 mb-8">Welcome to AnkaOS</h1>
+        
+        <div id="intro-screen" class="screen flex-grow flex flex-col justify-center space-y-8">
+            <div class="flex justify-center">
+                <a href="https://ankaosweb.vercel.app/" target="_blank" class="transition transform hover:scale-105">
+                    <img src="/assets/AnkaOS-logo.png" class="h-40 object-contain" alt="Anka logo" />
+                </a>
+            </div>
+            <div class="text-center space-y-6">
+                <p class="text-2xl text-gray-700">AnkaOS is an innovative open source Linux distribution based on [distro], designed with you in mind.</p>
+                <div class="flex justify-center space-x-4">
+                    <span class="bg-blue-100 text-blue-800 px-6 py-2 rounded-full text-lg font-semibold">User-Friendly</span>
+                    <span class="bg-green-100 text-green-800 px-6 py-2 rounded-full text-lg font-semibold">Stable</span>
+                    <span class="bg-purple-100 text-purple-800 px-6 py-2 rounded-full text-lg font-semibold">Modern</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="focus-screen" class="screen hidden flex-grow flex flex-col justify-center">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Our Vision & Goals</h2>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto w-full">
+                <div class="bg-blue-50 p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">🛡️ Stability</h3>
+                    <p class="text-gray-700 text-lg">Rock-solid performance you can rely on, day in and day out. Our system is built to last and provide a consistent experience.</p>
+                </div>
+                <div class="bg-green-50 p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-green-700 mb-4">🎯 Ease of Use</h3>
+                    <p class="text-gray-700 text-lg">Intuitive interface and thoughtful design make computing a breeze for everyone, from beginners to power users.</p>
+                </div>
+                <div class="bg-purple-50 p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-purple-700 mb-4">🔄 True Alternative</h3>
+                    <p class="text-gray-700 text-lg">A complete Windows alternative that doesn't compromise on features or compatibility. Freedom meets functionality.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="final-screen" class="screen hidden flex-grow flex flex-col justify-center space-y-8">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Join Our Journey</h2>
+            <div class="text-center space-y-6 max-w-4xl mx-auto">
+                <p class="text-2xl text-gray-700">Thank you for choosing AnkaOS! Together, we're building the future of computing.</p>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6">
+                    <p class="text-yellow-700 text-xl">🚀 We're working tirelessly to make AnkaOS the best operating system for you.</p>
+                </div>
+                <div class="mt-10">
+                    <a href="https://github.com/egdemte/ankaos_distro" class="inline-flex items-center bg-gray-800 text-white px-8 py-4 rounded-lg hover:bg-gray-700 transition text-xl">
+                        <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                        </svg>
+                        Contribute on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="p-6">
+        <div class="flex justify-between items-center">
+            <button onclick="prevScreen()" class="bg-gray-500 text-white px-8 py-3 rounded-lg hover:bg-gray-600 transition text-lg">Back</button>
+            <p class="text-gray-600">Welcome To Anka by Egehan KAHRAMAN</p>
+            <button onclick="nextScreen()" class="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition text-lg">Next</button>
+        </div>
+    </footer>
+</body>
+</html>
