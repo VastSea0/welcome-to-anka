@@ -1,8 +1,8 @@
 [package]
 name = "welcome-to-anka"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Welcome Screen For AnkaOS"
+authors = ["Egehan KAHRAMAN"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
