@@ -4,100 +4,219 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to AnkaOS</title>
+    <style>
+       
+      
+       footer {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background-color: #1f2937; /* Dark gray for better contrast */
+          z-index: 50; /* Ensures footer is on top */
+      }
+
+ 
+      .screen {
+        opacity: 0;
+        transform: translateX(20px);
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+      }
+    
+      .screen.active {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    
+     
+      .screen.hidden {
+        display: none;
+      }
+    </style>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        let currentScreen = 0;
-        const screens = ['intro-screen', 'focus-screen', 'final-screen'];
-        
-        function showScreen(index) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.add('hidden');
-            });
-            document.getElementById(screens[index]).classList.remove('hidden');
+        // Dark mode toggle functionality
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
         }
-        
+
+        const { invoke } = window.__TAURI__.tauri;
+
+        let currentScreen = 0;
+        const screens = ['first-screen','intro-screen', 'focus-screen', 'system-screen', 'final-screen'];
+
+        async function getSystemInfo() {
+            try {
+                const systemInfo = await invoke('system_info');
+                const lines = systemInfo.split('\n');
+                let cpuHtml = `<h4 class="font-semibold text-2xl mb-4">CPU Details</h4><ul class="list-disc list-inside space-y-2">`;
+                let memoryHtml = `<h4 class="font-semibold text-2xl mb-4">Memory Details</h4><ul class="list-disc list-inside space-y-2">`;
+                let diskHtml = `<h4 class="font-semibold text-2xl mb-4">Disk Details</h4><ul class="list-disc list-inside space-y-2">`;
+
+                let currentSection = '';
+
+                for (const line of lines) {
+                    if (line.startsWith('CPU Bilgileri:')) {
+                        currentSection = 'cpu';
+                    } else if (line.startsWith('Bellek Bilgileri:')) {
+                        currentSection = 'memory';
+                    } else if (line.startsWith('Disk Bilgileri:')) {
+                        currentSection = 'disk';
+                    }
+
+                    if (line.trim() === '') continue;
+
+                    switch (currentSection) {
+                        case 'cpu':
+                            cpuHtml += `<li class="ml-4">${line}</li>`;
+                            break;
+                        case 'memory':
+                            memoryHtml += `<li class="ml-4">${line}</li>`;
+                            break;
+                        case 'disk':
+                            diskHtml += `<li class="ml-4">${line}</li>`;
+                            break;
+                    }
+                }
+
+                cpuHtml += '</ul>';
+                memoryHtml += '</ul>';
+                diskHtml += '</ul>';
+
+                document.getElementById('cpu-info').innerHTML = cpuHtml;
+                document.getElementById('memory-info').innerHTML = memoryHtml;
+                document.getElementById('disk-info').innerHTML = diskHtml;
+            } catch (error) {
+                console.error('Sistem bilgileri alınırken hata:', error);
+            }
+        }
+
+        function showScreen(index) {
+          document.querySelectorAll('.screen').forEach(screen => {
+              screen.classList.remove('active');
+              screen.classList.add('hidden');
+          });
+          
+          const currentScreenEl = document.getElementById(screens[index]);
+          if (currentScreenEl) {
+              currentScreenEl.classList.remove('hidden');
+              
+              // Yavaşça ekranı görünür yapmak için küçük bir zaman gecikmesiyle `active` sınıfını ekliyoruz
+              setTimeout(() => {
+                  currentScreenEl.classList.add('active');
+              }, 50);
+              
+              if (screens[index] === 'system-screen') {
+                  getSystemInfo();
+              }
+          }
+}
+
+
         function nextScreen() {
             if (currentScreen < screens.length - 1) {
                 currentScreen++;
                 showScreen(currentScreen);
             }
         }
-        
+
         function prevScreen() {
             if (currentScreen > 0) {
                 currentScreen--;
                 showScreen(currentScreen);
             }
         }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            showScreen(currentScreen);
-        });
     </script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-gray-900 dark:bg-gray-900 text-gray-100 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300 ease-in-out">
     <main class="flex-grow flex flex-col p-8">
-        <h1 class="text-4xl font-bold text-center text-blue-600 mb-8">Welcome to AnkaOS</h1>
-        
-        <div id="intro-screen" class="screen flex-grow flex flex-col justify-center space-y-8">
+    
+      
+
+        <h1 class="text-4xl font-bold text-center text-teal-400 mb-8 animate-bounce">Welcome to AnkaOS</h1>
+        <div id="first-screen" class="screen flex-grow flex flex-col justify-center space-y-8 transition-opacity duration-500">
+           
+      </div>
+        <div id="intro-screen" class="screen flex-grow flex flex-col justify-center space-y-8 transition-opacity duration-500">
             <div class="flex justify-center">
-                <a href="https://ankaosweb.vercel.app/" target="_blank" class="transition transform hover:scale-105">
+                <a href="https://ankaosweb.vercel.app/" target="_blank" class="transition transform hover:scale-110 duration-300">
                     <img src="/assets/AnkaOS-logo.png" class="h-40 object-contain" alt="Anka logo" />
                 </a>
             </div>
             <div class="text-center space-y-6">
-                <p class="text-2xl text-gray-700">AnkaOS is an innovative open source Linux distribution based on [distro], designed with you in mind.</p>
+                <p class="text-2xl text-gray-300">AnkaOS is an innovative open-source Linux distribution based on Arch Linux, designed with you in mind.</p>
                 <div class="flex justify-center space-x-4">
-                    <span class="bg-blue-100 text-blue-800 px-6 py-2 rounded-full text-lg font-semibold">User-Friendly</span>
-                    <span class="bg-green-100 text-green-800 px-6 py-2 rounded-full text-lg font-semibold">Stable</span>
-                    <span class="bg-purple-100 text-purple-800 px-6 py-2 rounded-full text-lg font-semibold">Modern</span>
+                    <span class="bg-teal-500 text-white px-6 py-2 rounded-full text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">User-Friendly</span>
+                    <span class="bg-green-500 text-white px-6 py-2 rounded-full text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">Stable</span>
+                    <span class="bg-purple-500 text-white px-6 py-2 rounded-full text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">Modern</span>
                 </div>
             </div>
         </div>
-        
+
         <div id="focus-screen" class="screen hidden flex-grow flex flex-col justify-center">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Our Vision & Goals</h2>
+            <h2 class="text-3xl font-bold text-center text-gray-300 mb-10">Our Vision & Goals</h2>
             <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto w-full">
-                <div class="bg-blue-50 p-8 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">🛡️ Stability</h3>
-                    <p class="text-gray-700 text-lg">Rock-solid performance you can rely on, day in and day out. Our system is built to last and provide a consistent experience.</p>
+                <div class="bg-gray-800 p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-teal-400 mb-4">🛡️ Stability</h3>
+                    <p class="text-gray-400 text-lg">Rock-solid performance you can rely on, day in and day out. Our system is built to last and provide a consistent experience.</p>
                 </div>
-                <div class="bg-green-50 p-8 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold text-green-700 mb-4">🎯 Ease of Use</h3>
-                    <p class="text-gray-700 text-lg">Intuitive interface and thoughtful design make computing a breeze for everyone, from beginners to power users.</p>
+                <div class="bg-gray-800 p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-green-400 mb-4">🎯 Ease of Use</h3>
+                    <p class="text-gray-400 text-lg">Intuitive interface and thoughtful design make computing a breeze for everyone, from beginners to power users.</p>
                 </div>
-                <div class="bg-purple-50 p-8 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold text-purple-700 mb-4">🔄 True Alternative</h3>
-                    <p class="text-gray-700 text-lg">A complete Windows alternative that doesn't compromise on features or compatibility. Freedom meets functionality.</p>
+                <div class="bg-gray-800 p-8 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-purple-400 mb-4">🔄 True Alternative</h3>
+                    <p class="text-gray-400 text-lg">A complete Windows alternative that doesn't compromise on features or compatibility. Freedom meets functionality.</p>
                 </div>
             </div>
         </div>
-        
+
+        <div id="system-screen" class="screen hidden flex-grow flex flex-col justify-center py-8 system-screen">
+          <h2 class="text-3xl font-bold text-center text-gray-200 mb-6">System Monitor</h2>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-5xl mx-auto w-full">
+              <!-- CPU Information -->
+              <div class="bg-gray-700 text-white p-4 rounded-lg shadow-lg">
+                  <h3 class="text-2xl font-semibold mb-2">🛡️ CPU</h3>
+                  <div id="cpu-info" class="text-base bg-gray-800 p-2 rounded-lg overflow-auto"></div>
+              </div>
+              
+              <!-- Memory Information -->
+              <div class="bg-gray-700 text-white p-4 rounded-lg shadow-lg">
+                  <h3 class="text-2xl font-semibold mb-2">🎯 Memory</h3>
+                  <div id="memory-info" class="text-base bg-gray-800 p-2 rounded-lg overflow-auto"></div>
+              </div>
+              
+              <!-- Disk Information -->
+              <div class="bg-gray-700 text-white p-4 rounded-lg shadow-lg">
+                  <h3 class="text-2xl font-semibold mb-2">🔄 Disk</h3>
+                  <div id="disk-info" class="text-base bg-gray-800 p-2 rounded-lg overflow-auto"></div>
+              </div>
+          </div>
+      </div>
+      
+ 
+      
         <div id="final-screen" class="screen hidden flex-grow flex flex-col justify-center space-y-8">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Join Our Journey</h2>
-            <div class="text-center space-y-6 max-w-4xl mx-auto">
-                <p class="text-2xl text-gray-700">Thank you for choosing AnkaOS! Together, we're building the future of computing.</p>
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6">
-                    <p class="text-yellow-700 text-xl">🚀 We're working tirelessly to make AnkaOS the best operating system for you.</p>
-                </div>
-                <div class="mt-10">
-                    <a href="https://github.com/egdemte/ankaos_distro" class="inline-flex items-center bg-gray-800 text-white px-8 py-4 rounded-lg hover:bg-gray-700 transition text-xl">
-                        <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
-                        </svg>
-                        Contribute on GitHub
-                    </a>
-                </div>
+            <h2 class="text-3xl font-bold text-center text-gray-200 mb-6">Join Our Journey</h2>
+            <div class="text-center space-y-6">
+                <p class="text-2xl text-gray-400">Thank you for choosing AnkaOS! Together, we're building the future of computing.</p>
+                <a href="https://github.com/egdemte/ankaos_distro" class="inline-flex items-center bg-teal-500 text-white px-8 py-4 rounded-lg hover:bg-teal-400 transition text-xl shadow-lg">
+                  <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                  </svg>
+                    Contribute on GitHub
+                </a>
             </div>
         </div>
     </main>
     
-    <footer class="p-6">
-        <div class="flex justify-between items-center">
-            <button onclick="prevScreen()" class="bg-gray-500 text-white px-8 py-3 rounded-lg hover:bg-gray-600 transition text-lg">Back</button>
-            <p class="text-gray-600">Welcome To Anka by Egehan KAHRAMAN</p>
-            <button onclick="nextScreen()" class="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition text-lg">Next</button>
-        </div>
+    <footer class="p-4 bg-gray-800 text-white fixed bottom-0 left-0 right-0 z-50">
+      <div class="flex justify-between items-center">
+          <button onclick="prevScreen()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition">Back</button>
+          <p class="text-gray-300">"Welcome To Anka" by Egehan KAHRAMAN</p>
+          <button onclick="nextScreen()" class="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-400 transition">Next</button>
+      </div>
     </footer>
 </body>
 </html>

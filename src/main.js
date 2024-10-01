@@ -1,20 +1,31 @@
 const { invoke } = window.__TAURI__.tauri;
 
+// Global değişkenler
 let heloInputEl;
 let heloMsgEl;
 
+// Selamlama fonksiyonu
 async function sayhelo() {
-  // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-  heloMsgEl.textContent = await invoke("sayhelo", { name: heloInputEl.value });
+    heloMsgEl.textContent = await invoke("sayhelo", { name: heloInputEl.value });
 }
 
+
+
+// Sayfa yüklendiğinde çalışacak kodlar
 window.addEventListener("DOMContentLoaded", () => {
-  heloInputEl = document.querySelector("#greet-input");
-  heloMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    sayhelo();
-  });
+    // Form elementlerini bul
+    heloInputEl = document.querySelector("#greet-input");
+    heloMsgEl = document.querySelector("#greet-msg");
+    
+    // Form submit event listener'ı ekle
+    const greetForm = document.querySelector("#greet-form");
+    if (greetForm) {
+        greetForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            sayhelo();
+        });
+    }
+    
+    // İlk ekranı göster
+    showScreen(currentScreen);
 });
-
-
