@@ -44,7 +44,7 @@
         const { invoke } = window.__TAURI__.tauri;
 
         let currentScreen = 0;
-        const screens = ['first-screen','intro-screen', 'focus-screen', 'system-screen', 'final-screen'];
+        const screens = ['intro-screen', 'focus-screen', 'system-screen', 'final-screen'];
 
         async function getSystemInfo() {
             try {
@@ -92,53 +92,80 @@
             }
         }
 
+        
+
         function showScreen(index) {
-          document.querySelectorAll('.screen').forEach(screen => {
-              screen.classList.remove('active');
-              screen.classList.add('hidden');
-          });
-          
-          const currentScreenEl = document.getElementById(screens[index]);
-          if (currentScreenEl) {
-              currentScreenEl.classList.remove('hidden');
-              
-              // Yavaşça ekranı görünür yapmak için küçük bir zaman gecikmesiyle `active` sınıfını ekliyoruz
-              setTimeout(() => {
-                  currentScreenEl.classList.add('active');
-              }, 50);
-              
-              if (screens[index] === 'system-screen') {
-                  getSystemInfo();
-                  setInterval(getSystemInfo, 1000); // Update system info every 5 seconds
-              }
-          }
+            // Tüm ekranları gizle
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.add('hidden');
+                screen.classList.remove('active');
+            });
+
+            // Menüdeki seçilen ekranı aktif yap
+            document.querySelectorAll('ul li').forEach((li, i) => {
+                li.classList.toggle('bg-gray-700', i === index);
+                li.classList.toggle('text-white', i === index);
+                li.classList.toggle('text-gray-400', i !== index);
+            });
+
+             
+            const currentScreenEl = document.getElementById(screens[index]);
+            if (currentScreenEl) {
+                currentScreenEl.classList.remove('hidden');
+                currentScreenEl.classList.add('active');
+                
+                
+                if (screens[index] === 'system-screen') {
+                    getSystemInfo();
+                    setInterval(getSystemInfo, 1000);
+                }
+            }
+            currentScreen = index;
+        }
+
+
+
+function nextScreen() {
+    if (currentScreen < screens.length - 1) {
+        currentScreen++;
+        showScreen(currentScreen);
+    }
 }
 
+ 
+function prevScreen() {
+    if (currentScreen > 0) {
+        currentScreen--;
+        showScreen(currentScreen);
+    }
+}
 
-        function nextScreen() {
-            if (currentScreen < screens.length - 1) {
-                currentScreen++;
-                showScreen(currentScreen);
-            }
-        }
-
-        function prevScreen() {
-            if (currentScreen > 0) {
-                currentScreen--;
-                showScreen(currentScreen);
-            }
-        }
+document.addEventListener('DOMContentLoaded', () => {
+            showScreen(0);  
+        });
     </script>
 </head>
 <body class="bg-gray-900 dark:bg-gray-900 text-gray-100 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300 ease-in-out">
-    <main class="flex-grow flex flex-col p-8">
-    
-      
+    <main class="flex-grow flex flex-row">
+     
+        <div class="w-1/4 bg-gray-800 p-5">
+             
+            <ul>
+             
+                <li onclick="showScreen(0)" class="bg-gray-700 text-white py-2 px-4 rounded mb-2 cursor-pointer">Welcome</li>
+                <li onclick="showScreen(1)" class="text-gray-400 py-2 px-4 hover:bg-gray-700 hover:text-white rounded mb-2 cursor-pointer">Our Vision & Goals</li>
+                <li onclick="showScreen(2)" class="text-gray-400 py-2 px-4 hover:bg-gray-700 hover:text-white rounded mb-2 cursor-pointer">System Monitor</li>
+                <li onclick="showScreen(3)" class="text-gray-400 py-2 px-4 hover:bg-gray-700 hover:text-white rounded mb-2 cursor-pointer">Join Our Journey</li>
+            </ul>
+        </div>
+        
+          
+
+       <div class="flex-grow p-8 bg-zinc-900 dark:bg-zinc-900 text-zinc-100 dark:text-zinc-100">
 
         <h1 class="text-4xl font-bold text-center text-teal-400 mb-8 animate-bounce">Welcome to AnkaOS</h1>
-        <div id="first-screen" class="screen flex-grow flex flex-col justify-center space-y-8 transition-opacity duration-500">
-           
-      </div>
+    
+       
         <div id="intro-screen" class="screen flex-grow flex flex-col justify-center space-y-8 transition-opacity duration-500">
             <div class="flex justify-center">
                 <a href="https://ankaosweb.vercel.app/" target="_blank" class="transition transform hover:scale-110 duration-300">
@@ -212,6 +239,8 @@
                 </a>
             </div>
         </div>
+
+    </div>
     </main>
     
     <footer class="p-4 bg-gray-800 text-white fixed bottom-0 left-0 right-0 z-50">
